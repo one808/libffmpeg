@@ -65,7 +65,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y \
+          sudo apt-get install --no-install-recommends -y autoconf automake libtool \
             ccache g++-mingw-w64-i686 nasm pkg-config git cmake
 
       - name: Clone FFmpeg source
