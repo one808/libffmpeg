@@ -68,18 +68,6 @@ build_dep "ogg" "https://github.com/xiph/ogg.git" \
 build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
-# 7. openssl
-echo "=== Building openssl ==="
-rm -rf "$DEPS/openssl"
-git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
-cd "$DEPS/openssl"
-CC=${TARGET}-gcc AR=${TARGET}-ar RANLIB=${TARGET}-ranlib   ./Configure mingw32 \
-    --prefix="$PREFIX" \
-    no-asm
-make -j$JOBS
-make install_sw
-cd "$WORK_DIR"
-
 # 8. Build FFmpeg
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
@@ -108,7 +96,7 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-libopus \
     --enable-libvorbis \
     --enable-libfdk-aac \
-    --enable-openssl \
+    --disable-openssl \
     --disable-libass \
     --disable-debug \
     --disable-doc \
