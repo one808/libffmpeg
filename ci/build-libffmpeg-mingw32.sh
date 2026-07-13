@@ -79,7 +79,7 @@ EXTRA_CFLAGS="-I$PREFIX/include"
 EXTRA_LDFLAGS="-L$PREFIX/lib"
 
 ./configure \
-    --pkg-config=pkg-config \
+    --disable-pkg-config \
     --target-os=mingw32 \
     --arch=x86 \
     --cross-prefix=${TARGET}- \
