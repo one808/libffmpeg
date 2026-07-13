@@ -71,6 +71,7 @@ jobs:
 
       - name: Build FFmpeg DLL
         run: |
+          cd ffmpeg-source
           chmod +x ./ci/build-libffmpeg-mingw32.sh
           ./ci/build-libffmpeg-mingw32.sh
 
