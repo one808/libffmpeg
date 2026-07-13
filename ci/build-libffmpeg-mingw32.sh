@@ -1,18 +1,94 @@
 #!/bin/bash -e
 # build-libffmpeg-mingw32.sh
-# 编译 FFmpeg 32位 Windows DLL
+# 编译 FFmpeg 32位 Windows DLL（含所有外部库）
 
 TARGET=i686-w64-mingw32
 PREFIX="$(pwd)/ffmpeg-install"
+DEPS="$(pwd)/deps"
 JOBS=$(nproc)
 
 echo "=== FFmpeg 32-bit DLL build ==="
 echo "Target: $TARGET"
 
+mkdir -p "$PREFIX" "$DEPS"
+
+# 下载并编译函数
+build_dep() {
+    local name=$1 url=$2 configure_args=$3
+    echo "=== Building $name ==="
+    if [ ! -d "$DEPS/$name" ]; then
+        git clone --depth 1 "$url" "$DEPS/$name"
+    fi
+    cd "$DEPS/$name"
+    if [ ! -f Makefile ] && [ ! -f configure ]; then
+        ./autogen.sh 2>/dev/null || true
+    fi
+    if [ -f configure ]; then
+        ./configure --host=$TARGET --prefix="$PREFIX" $configure_args --enable-static --disable-shared
+    fi
+    make -j$JOBS
+    make install
+    cd -
+}
+
+# 1. x264
+build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
+    "--enable-pic --enable-static --disable-cli --disable-lavf --disable-swf"
+
+# 2. x265
+if [ ! -d "$DEPS/x265" ]; then
+    git clone --depth 1 "https://bitbucket.org/multicoreware/x265_git.git" "$DEPS/x265"
+fi
+cd "$DEPS/x265"
+mkdir -p build && cd build
+cmake -DCMAKE_SYSTEM_NAME=Windows \
+    -DCMAKE_C_COMPILER=${TARGET}-gcc \
+    -DCMAKE_CXX_COMPILER=${TARGET}-g++ \
+    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_CLI=OFF \
+    -DENABLE_SHARED=OFF \
+    -DENABLE_CLI=OFF \
+    ../source
+make -j$JOBS
+make install
+cd ../../..
+
+# 3. libvpx
+build_dep "libvpx" "https://chromium.googlesource.com/webm/libvpx.git" \
+    "--enable-vp8 --enable-vp9 --enable-static --disable-shared --disable-examples --disable-tools --disable-unit-tests --target=${TARGET}"
+
+# 4. lame
+build_dep "lame" "https://svn.code.sf.net/p/lame/svn/trunk/lame" \
+    "--enable-nasm --disable-frontend --disable-mp3x"
+
+# 5. opus
+build_dep "opus" "https://github.com/xiph/opus.git" \
+    "--enable-static --disable-shared --disable-extra-programs --disable-doc"
+
+# 6. fdk-aac
+build_dep "fdk-aac" "https://github.com/mstorsjo/fdk-aac.git" \
+    "--enable-static --disable-shared"
+
+# 7. vorbis (需要 ogg)
+build_dep "ogg" "https://github.com/xiph/ogg.git" \
+    "--enable-static --disable-shared"
+build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
+    "--enable-static --disable-shared --disable-examples"
+
+# 8. openssl
+build_dep "openssl" "https://github.com/openssl/openssl.git" \
+    "no-shared no-tests no-ssl2 no-ssl3 no-zlib no-comp no-asm enable-ec_nistp_64_gcc_128"
+
+echo "=== Dependencies built ==="
+
+# 编译 FFmpeg
 if [ ! -f configure ]; then
     echo "Error: configure not found. Run from FFmpeg source directory." >&2
     exit 1
 fi
+
+export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/lib64/pkgconfig:$PKG_CONFIG_PATH"
 
 ./configure \
     --target-os=mingw32 \
@@ -26,6 +102,7 @@ fi
     --disable-debug \
     --enable-gpl \
     --enable-version3 \
+    --enable-nonfree \
     --enable-runtime-cpudetect \
     --enable-dxva2 \
     --enable-d3d11va \
@@ -34,22 +111,25 @@ fi
     --enable-libx264 \
     --enable-libx265 \
     --enable-libvpx \
-     \
-     \
-     \
-     \
-    --extra-cflags="-O2 -static-libgcc" \
-    --extra-ldflags="-static-libgcc"
+    --enable-libmp3lame \
+    --enable-libopus \
+    --enable-libvorbis \
+    --enable-libfdk-aac \
+    --enable-openssl \
+    --enable-libass \
+    --extra-cflags="-I$PREFIX/include -O2 -static-libgcc" \
+    --extra-ldflags="-L$PREFIX/lib -static-libgcc" \
+    --extra-libs="-lpthread"
 
-echo "=== Building with $JOBS jobs ==="
-make -j${JOBS}
+echo "=== Building FFmpeg with $JOBS jobs ==="
+make -j$JOBS
 
 echo "=== Installing ==="
 make install
 
 echo "=== Collecting DLLs ==="
 mkdir -p ../../artifact
-cp -v "$PREFIX"/bin/*.dll ../../artifact/
+cp -v "$PREFIX"/bin/*.dll ../../artifact/ 2>/dev/null || true
 cp -rv "$PREFIX"/include ../../artifact/ 2>/dev/null || true
 cp -rv "$PREFIX"/lib ../../artifact/ 2>/dev/null || true
 
