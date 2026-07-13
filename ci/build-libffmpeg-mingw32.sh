@@ -54,7 +54,7 @@ cmake -DCMAKE_SYSTEM_NAME=Windows \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_CLI=OFF \
     -DENABLE_SHARED=OFF \
-    ../source
+    ../source -DCMAKE_SYSTEM_PROCESSOR=x86 -DCMAKE_ASM_NASM_FLAGS=-w
 make -j$JOBS
 make install
 cd ../../..
