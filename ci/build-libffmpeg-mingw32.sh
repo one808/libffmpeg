@@ -73,10 +73,9 @@ echo "=== Building openssl ==="
 rm -rf "$DEPS/openssl"
 git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
 cd "$DEPS/openssl"
-./Configure mingw32 \
+CC=${TARGET}-gcc AR=${TARGET}-ar RANLIB=${TARGET}-ranlib   ./Configure mingw32 \
     --prefix="$PREFIX" \
-    --cross-compile-prefix=${TARGET}- \
-    no-shared no-asm no-tests
+    no-asm
 make -j$JOBS
 make install_sw
 cd "$WORK_DIR"
