@@ -18,7 +18,10 @@ jobs:
       - name: Check upstream version
         id: check
         run: |
-          UPSTREAM_VERSION=$(curl -s https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/FFVERSION | tr -d '\n')
+          UPSTREAM_VERSION=$(git ls-remote --tags https://github.com/FFmpeg/FFmpeg.git 2>/dev/null | grep -oP 'refs/tags/n\K[0-9.]+' | sort -V | tail -1)
+          if [ -z "$UPSTREAM_VERSION" ]; then
+            UPSTREAM_VERSION=$(curl -s https://ffmpeg.org/releases/ 2>/dev/null | grep -oP 'ffmpeg-\K[0-9.]+' | sort -V | tail -1)
+          fi
           echo "Upstream version: $UPSTREAM_VERSION"
           LAST_VERSION=$(cat .last_build_version 2>/dev/null || echo "none")
           echo "Last built version: $LAST_VERSION"
@@ -72,8 +75,9 @@ jobs:
       - name: Build FFmpeg DLL
         run: |
           cd ffmpeg-source
-          chmod +x ./ci/build-libffmpeg-mingw32.sh
-          ./ci/build-libffmpeg-mingw32.sh
+          cp ../ci/build-libffmpeg-mingw32.sh .
+          chmod +x build-libffmpeg-mingw32.sh
+          ./build-libffmpeg-mingw32.sh
 
       - name: Package artifact
         run: |
