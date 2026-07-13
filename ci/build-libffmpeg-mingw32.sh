@@ -49,7 +49,7 @@ build_dep "libvpx" "https://chromium.googlesource.com/webm/libvpx.git" \
     "--target=generic-gnu --enable-vp8 --enable-vp9 --enable-static --disable-shared --disable-examples --disable-tools --disable-unit-tests"
 
 # 3. lame
-build_dep "lame" "https://svn.code.sf.net/p/lame/svn/trunk/lame" \
+build_dep "lame" "https://github.com/lameproject/lame.git" \
     "--enable-nasm --disable-frontend --disable-mp3x"
 
 # 4. opus
