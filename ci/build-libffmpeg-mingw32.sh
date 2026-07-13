@@ -3,6 +3,7 @@
 # 编译 FFmpeg 32位 Windows DLL（含所有外部库）
 
 TARGET=i686-w64-mingw32
+WORK_DIR="$(pwd)"
 PREFIX="$(pwd)/ffmpeg-install"
 DEPS="$(pwd)/deps"
 JOBS=$(nproc)
@@ -15,8 +16,9 @@ export STRIP=${TARGET}-strip
 
 echo "=== FFmpeg 32-bit DLL build ==="
 echo "Target: $TARGET"
+echo "WORK_DIR: $WORK_DIR"
 
-mkdir -p "$PREFIX" "$DEPS"
+mkdir -p "$PREFIX" "$DEPS" "$WORK_DIR/artifact"
 
 build_dep() {
     local name=$1 url=$2 configure_args=$3
@@ -37,7 +39,7 @@ build_dep() {
     fi
     make -j$JOBS
     make install
-    cd -
+    cd "$WORK_DIR"
 }
 
 # 1. x264
@@ -66,3 +68,62 @@ build_dep "ogg" "https://github.com/xiph/ogg.git" \
 build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
+# 7. openssl
+echo "=== Building openssl ==="
+if [ ! -d "$DEPS/openssl" ]; then
+    git clone --depth 1 https://github.com/openssl/openssl.git "$DEPS/openssl"
+fi
+cd "$DEPS/openssl"
+./Configure mingw32 \
+    --prefix="$PREFIX" \
+    --cross-compile-prefix=${TARGET}- \
+    no-shared no-asm no-tests
+make -j$JOBS
+make install_sw
+cd "$WORK_DIR"
+
+# 8. Build FFmpeg
+echo "=== Building FFmpeg ==="
+cd "$WORK_DIR"
+
+EXTRA_LIBS="-L$PREFIX/lib"
+EXTRA_CFLAGS="-I$PREFIX/include"
+EXTRA_LDFLAGS="-L$PREFIX/lib"
+
+./configure \
+    --target-os=mingw32 \
+    --arch=x86 \
+    --cross-prefix=${TARGET}- \
+    --prefix="$WORK_DIR/artifact" \
+    --enable-shared \
+    --disable-static \
+    --enable-gpl \
+    --enable-version3 \
+    --enable-nonfree \
+    --enable-dxva2 \
+    --enable-d3d11va \
+    --enable-nvdec \
+    --enable-nvenc \
+    --enable-libx264 \
+    --enable-libvpx \
+    --enable-libmp3lame \
+    --enable-libopus \
+    --enable-libvorbis \
+    --enable-libfdk-aac \
+    --enable-openssl \
+    --disable-libass \
+    --disable-debug \
+    --disable-doc \
+    --disable-programs \
+    --extra-cflags="$EXTRA_CFLAGS" \
+    --extra-ldflags="$EXTRA_LDFLAGS" \
+    --extra-libs="$EXTRA_LIBS"
+
+make -j$JOBS
+make install
+
+# 9. Package artifact
+echo "=== Package artifact ==="
+echo "Contents of artifact dir:"
+ls -la "$WORK_DIR/artifact/bin/" 2>/dev/null || echo "No bin dir"
+echo "BUILD COMPLETE"
