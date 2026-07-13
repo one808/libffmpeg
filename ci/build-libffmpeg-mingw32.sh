@@ -93,7 +93,7 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nvdec \
     --enable-nvenc \
     --enable-libx264 \
-    --enable-libvpx \
+    --disable-libvpx \
     --enable-libmp3lame \
     --enable-libopus \
     --disable-libvorbis \
