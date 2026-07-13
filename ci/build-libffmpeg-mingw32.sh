@@ -90,8 +90,8 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nonfree \
     --enable-dxva2 \
     --enable-d3d11va \
-    --enable-nvdec \
-    --enable-nvenc \
+    --disable-nvdec \
+    --disable-nvenc \
     --enable-libx264 \
     --disable-libvpx \
     --enable-libmp3lame \
