@@ -77,6 +77,15 @@ cat "$PREFIX/lib/pkgconfig/vpx.pc" 2>/dev/null || echo "vpx.pc not found"
 echo "=== Debug: PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR ==="
 echo "=== Debug: pkg-config vpx ==="
 pkg-config --cflags --libs vpx 2>&1 || echo "pkg-config vpx failed"
+echo "=== Debug: manual vpx test ==="
+echo '#include <vpx/vpx_decoder.h>' > /tmp/test_vpx.c
+echo '#include <vpx/vp8dx.h>' >> /tmp/test_vpx.c
+echo 'int main(void) { const vpx_codec_iface_t *iface = vpx_get_vp8_decoder(); return 0; }' >> /tmp/test_vpx.c
+${TARGET}-gcc -I"$PREFIX/include" -c /tmp/test_vpx.c -o /tmp/test_vpx.o 2>&1 && echo "compile OK" || echo "compile FAILED"
+${TARGET}-gcc /tmp/test_vpx.o -L"$PREFIX/lib" -lvpx -lm -o /tmp/test_vpx 2>&1 && echo "link OK" || echo "link FAILED"
+echo "=== Debug: VP8 decoder symbols ==="
+${TARGET}-nm "$PREFIX/lib/libvpx.a" 2>/dev/null | grep -c "vp8_decoder" || echo "no vp8_decoder symbols"
+${TARGET}-nm "$PREFIX/lib/libvpx.a" 2>/dev/null | grep -c "vp9_decoder" || echo "no vp9_decoder symbols"
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
 
