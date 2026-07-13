@@ -51,7 +51,7 @@ build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
 
 # 2. libvpx
 build_dep "libvpx" "https://chromium.googlesource.com/webm/libvpx.git" \
-    "--target=x86-win32-gcc --enable-vp8 --enable-vp9 --enable-static --disable-shared --disable-examples --disable-tools --disable-unit-tests --enable-multithread"
+    "--target=x86-win32-gcc --enable-vp8 --enable-vp9 --enable-static --disable-shared --disable-examples --disable-tools --disable-unit-tests --disable-multithread"
 
 # 3. lame
 build_dep "lame" "https://github.com/lameproject/lame.git" \
@@ -79,8 +79,6 @@ echo "=== Debug: pkg-config vpx ==="
 pkg-config --cflags --libs vpx 2>&1 || echo "pkg-config vpx failed"
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
-# Temporarily disable set -e for configure debugging
-set +e
 
 EXTRA_LIBS="-L$PREFIX/lib"
 EXTRA_CFLAGS="-I$PREFIX/include"
@@ -115,15 +113,6 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --extra-ldflags="$EXTRA_LDFLAGS" \
     --extra-libs="$EXTRA_LIBS"
 
-CONFIGURE_EXIT=$?
-if [ $CONFIGURE_EXIT -ne 0 ]; then
-    echo "=== config.log tail ==="
-    tail -80 ffbuild/config.log 2>/dev/null
-    echo "=== libvpx section ==="
-    grep -B2 -A30 "libvpx" ffbuild/config.log 2>/dev/null | head -50
-    exit $CONFIGURE_EXIT
-fi
-set -e
 make -j$JOBS
 make install
 
