@@ -79,15 +79,10 @@ jobs:
           chmod +x build-libffmpeg-mingw32.sh
           ./build-libffmpeg-mingw32.sh
 
-      - name: Package artifact
-        run: |
-          cd ffmpeg-source/artifact
-          zip -r ../libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip .
-
       - uses: actions/upload-artifact@v7
         with:
           name: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}
-          path: ffmpeg-source/libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
+          path: ffmpeg-source/artifact/
 
       - name: Update version record
         run: |
@@ -114,5 +109,5 @@ jobs:
             Auto-built from FFmpeg ${{ env.FFMPEG_VERSION }}
             Platform: ${{ env.PLATFORM }}
             Commit: ${{ github.sha }}
-          files: ffmpeg-source/libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
+          files: ffmpeg-source/artifact/**
           make_latest: false
