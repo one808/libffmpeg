@@ -50,7 +50,7 @@ build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
 
 # 2. libvpx
 build_dep "libvpx" "https://chromium.googlesource.com/webm/libvpx.git" \
-    "--target=generic-gnu --enable-vp8 --enable-vp9 --enable-static --disable-shared --disable-examples --disable-tools --disable-unit-tests"
+    "--target=x86-win32-gcc --enable-vp8 --enable-vp9 --enable-static --disable-shared --disable-examples --disable-tools --disable-unit-tests --enable-multithread"
 
 # 3. lame
 build_dep "lame" "https://github.com/lameproject/lame.git" \
