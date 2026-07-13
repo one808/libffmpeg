@@ -34,10 +34,10 @@ fi
     --enable-libx264 \
     --enable-libx265 \
     --enable-libvpx \
-    --enable-libmp3lame \
-    --enable-libopus \
-    --enable-libvorbis \
-    --enable-openssl \
+     \
+     \
+     \
+     \
     --extra-cflags="-O2 -static-libgcc" \
     --extra-ldflags="-static-libgcc"
 
