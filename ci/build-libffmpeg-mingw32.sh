@@ -48,8 +48,8 @@ fi
 cd "$DEPS/x265"
 mkdir -p build && cd build
 cmake -DCMAKE_SYSTEM_NAME=Windows \
-    -DCMAKE_C_COMPILER='${TARGET}-gcc' \
-    -DCMAKE_CXX_COMPILER='${TARGET}-g++' \
+    -DCMAKE_C_COMPILER="-gcc" \
+    -DCMAKE_CXX_COMPILER="-g++" \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_CLI=OFF \
