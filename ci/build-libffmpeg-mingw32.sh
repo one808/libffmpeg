@@ -70,15 +70,12 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
 
 # 7. openssl
 echo "=== Building openssl ==="
-if [ ! -d "$DEPS/openssl" ]; then
-    git clone --depth 1 https://github.com/openssl/openssl.git "$DEPS/openssl"
-fi
+rm -rf "$DEPS/openssl"
+git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
 cd "$DEPS/openssl"
 ./Configure mingw32 \
     --prefix="$PREFIX" \
-    CC="${TARGET}-gcc" \
-    AR="${TARGET}-ar" \
-    RANLIB="${TARGET}-ranlib" \
+    --cross-compile-prefix=${TARGET}- \
     no-shared no-asm no-tests
 make -j$JOBS
 make install_sw
