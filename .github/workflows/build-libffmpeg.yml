@@ -81,7 +81,7 @@ jobs:
 
       - name: Package artifact
         run: |
-          cd artifact
+          cd ffmpeg-source/../../artifact
           zip -r ../libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip .
 
       - uses: actions/upload-artifact@v7
