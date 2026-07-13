@@ -76,7 +76,9 @@ fi
 cd "$DEPS/openssl"
 ./Configure mingw32 \
     --prefix="$PREFIX" \
-    --cross-compile-prefix=${TARGET}- \
+    CC="${TARGET}-gcc" \
+    AR="${TARGET}-ar" \
+    RANLIB="${TARGET}-ranlib" \
     no-shared no-asm no-tests
 make -j$JOBS
 make install_sw
