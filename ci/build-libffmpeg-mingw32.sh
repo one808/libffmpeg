@@ -3,6 +3,7 @@
 # 编译 FFmpeg 32位 Windows DLL（含所有外部库）
 
 TARGET=i686-w64-mingw32
+export PATH="/usr/lib/gcc-cross/i686-w64-linux-gnu/13:$PATH"
 PREFIX="$(pwd)/ffmpeg-install"
 DEPS="$(pwd)/deps"
 JOBS=$(nproc)
