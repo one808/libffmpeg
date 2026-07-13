@@ -3,17 +3,22 @@
 # 编译 FFmpeg 32位 Windows DLL（含所有外部库）
 
 TARGET=i686-w64-mingw32
-export PATH="/usr/lib/gcc-cross/i686-w64-linux-gnu/13:$PATH"
 PREFIX="$(pwd)/ffmpeg-install"
 DEPS="$(pwd)/deps"
 JOBS=$(nproc)
 
+export CC=${TARGET}-gcc
+export CXX=${TARGET}-g++
+export AR=${TARGET}-ar
+export RANLIB=${TARGET}-ranlib
+export STRIP=${TARGET}-strip
+
 echo "=== FFmpeg 32-bit DLL build ==="
 echo "Target: $TARGET"
+echo "CC: $CC"
 
 mkdir -p "$PREFIX" "$DEPS"
 
-# 下载并编译函数
 build_dep() {
     local name=$1 url=$2 configure_args=$3
     echo "=== Building $name ==="
@@ -34,7 +39,7 @@ build_dep() {
 
 # 1. x264
 build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
-    "--enable-pic --enable-static --disable-cli --disable-lavf --disable-swf"
+    "--enable-pic --enable-static --disable-cli --disable-lavf"
 
 # 2. x265
 if [ ! -d "$DEPS/x265" ]; then
@@ -49,7 +54,6 @@ cmake -DCMAKE_SYSTEM_NAME=Windows \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_CLI=OFF \
     -DENABLE_SHARED=OFF \
-    -DENABLE_CLI=OFF \
     ../source
 make -j$JOBS
 make install
@@ -71,7 +75,7 @@ build_dep "opus" "https://github.com/xiph/opus.git" \
 build_dep "fdk-aac" "https://github.com/mstorsjo/fdk-aac.git" \
     "--enable-static --disable-shared"
 
-# 7. vorbis (需要 ogg)
+# 7. ogg + vorbis
 build_dep "ogg" "https://github.com/xiph/ogg.git" \
     "--enable-static --disable-shared"
 build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
@@ -83,7 +87,6 @@ build_dep "openssl" "https://github.com/openssl/openssl.git" \
 
 echo "=== Dependencies built ==="
 
-# 编译 FFmpeg
 if [ ! -f configure ]; then
     echo "Error: configure not found. Run from FFmpeg source directory." >&2
     exit 1
