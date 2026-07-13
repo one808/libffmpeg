@@ -72,6 +72,11 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
 # 8. Build FFmpeg
+echo "=== Debug: vpx.pc ==="
+cat "$PREFIX/lib/pkgconfig/vpx.pc" 2>/dev/null || echo "vpx.pc not found"
+echo "=== Debug: PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR ==="
+echo "=== Debug: pkg-config vpx ==="
+pkg-config --cflags --libs vpx 2>&1 || echo "pkg-config vpx failed"
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
 
