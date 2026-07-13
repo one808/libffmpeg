@@ -87,7 +87,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}
-          path: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
+          path: ffmpeg-source/libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
 
       - name: Update version record
         run: |
@@ -114,5 +114,5 @@ jobs:
             Auto-built from FFmpeg ${{ env.FFMPEG_VERSION }}
             Platform: ${{ env.PLATFORM }}
             Commit: ${{ github.sha }}
-          files: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
+          files: ffmpeg-source/libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
           make_latest: false
