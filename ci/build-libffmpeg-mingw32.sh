@@ -54,7 +54,7 @@ cmake -DCMAKE_SYSTEM_NAME=Windows \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_CLI=OFF \
     -DENABLE_SHARED=OFF \
-    -DENABLE_ASM=OFF \
+    -DENABLE_ASM=OFF -DCMAKE_SYSTEM_PROCESSOR=x86 -DENABLE_NEON=OFF \
     ../source
 make -j$JOBS
 make install
