@@ -1,0 +1,22 @@
+name: Reset Build Version
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reset:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Delete version record
+        run: |
+          rm -f .last_build_version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "ci: reset build version record" || true
+          git push origin main
