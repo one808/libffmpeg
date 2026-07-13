@@ -114,14 +114,14 @@ export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/lib64/pkgconfig:$PKG_CONFI
     --enable-nvdec \
     --enable-nvenc \
     --enable-libx264 \
-    --enable-libx265 \
+    --disable-libx265 \
     --enable-libvpx \
     --enable-libmp3lame \
     --enable-libopus \
     --enable-libvorbis \
     --enable-libfdk-aac \
     --enable-openssl \
-    --enable-libass \
+    --disable-libass \
     --extra-cflags="-I$PREFIX/include -O2 -static-libgcc" \
     --extra-ldflags="-L$PREFIX/lib -static-libgcc" \
     --extra-libs="-lpthread"
