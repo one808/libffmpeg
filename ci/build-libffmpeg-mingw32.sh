@@ -41,24 +41,6 @@ build_dep() {
 build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
     "--enable-pic --enable-static --disable-cli --disable-lavf"
 
-# 2. x265
-if [ ! -d "$DEPS/x265" ]; then
-    git clone --depth 1 "https://bitbucket.org/multicoreware/x265_git.git" "$DEPS/x265"
-fi
-cd "$DEPS/x265"
-mkdir -p build && cd build
-cmake -DCMAKE_SYSTEM_NAME=Windows \
-    -DCMAKE_C_COMPILER="/usr/bin/i686-w64-mingw32-gcc" \
-    -DCMAKE_CXX_COMPILER="/usr/bin/i686-w64-mingw32-g++" \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DENABLE_CLI=OFF \
-    -DENABLE_SHARED=OFF \
-    -DENABLE_ASM=OFF -DCMAKE_SYSTEM_PROCESSOR=x86 -DENABLE_NEON=OFF -DCMAKE_ASM_NASM_FLAGS="-w" -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32" \
-    ../source
-make -j$JOBS
-make install
-cd ../../..
 
 # 3. libvpx
 build_dep "libvpx" "https://chromium.googlesource.com/webm/libvpx.git" \
