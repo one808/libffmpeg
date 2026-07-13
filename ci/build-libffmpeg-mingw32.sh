@@ -98,8 +98,8 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-libvpx \
     --enable-libmp3lame \
     --enable-libopus \
-    --enable-libvorbis \
-    --enable-libfdk-aac \
+    --disable-libvorbis \
+    --disable-libfdk-aac \
     --disable-openssl \
     --disable-libass \
     --disable-debug \
