@@ -1,0 +1,113 @@
+name: Build FFmpeg DLL
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+      ffmpeg_version: ${{ steps.check.outputs.ffmpeg_version }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check upstream version
+        id: check
+        run: |
+          UPSTREAM_VERSION=$(curl -s https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/FFVERSION | tr -d '\n')
+          echo "Upstream version: $UPSTREAM_VERSION"
+          LAST_VERSION=$(cat .last_build_version 2>/dev/null || echo "none")
+          echo "Last built version: $LAST_VERSION"
+          if [ "$UPSTREAM_VERSION" = "$LAST_VERSION" ]; then
+            echo "Version unchanged, skip build"
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          else
+            echo "New version detected: $UPSTREAM_VERSION"
+            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "ffmpeg_version=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: check-and-build
+    if: needs.check-and-build.outputs.should_build == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      TARGET: i686-w64-mingw32
+      PLATFORM: windows-i686
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_MAXSIZE: 500M
+      FFMPEG_VERSION: ${{ needs.check-and-build.outputs.ffmpeg_version }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Get time
+        id: get_time
+        run: echo "timestamp=$(date +%s%N)" >> $GITHUB_OUTPUT
+
+      - name: Restore cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ffmpeg-${{ steps.get_time.outputs.timestamp }}
+          restore-keys: ffmpeg-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            ccache g++-mingw-w64-i686 nasm pkg-config git
+
+      - name: Clone FFmpeg source
+        run: |
+          git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg-source
+
+      - name: Build FFmpeg DLL
+        run: |
+          chmod +x ./ci/build-libffmpeg-mingw32.sh
+          ./ci/build-libffmpeg-mingw32.sh
+
+      - name: Package artifact
+        run: |
+          cd artifact
+          zip -r ../libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip .
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}
+          path: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
+
+      - name: Update version record
+        run: |
+          echo "${{ env.FFMPEG_VERSION }}" > .last_build_version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .last_build_version
+          git commit -m "Build FFmpeg ${{ env.FFMPEG_VERSION }}" || true
+          git push origin main || true
+
+      - name: Save Cache
+        uses: actions/cache/save@v6
+        if: always()
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ffmpeg-${{ steps.get_time.outputs.timestamp }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}
+          name: FFmpeg ${{ env.FFMPEG_VERSION }} (${{ env.PLATFORM }})
+          body: |
+            Auto-built from FFmpeg ${{ env.FFMPEG_VERSION }}
+            Platform: ${{ env.PLATFORM }}
+            Commit: ${{ github.sha }}
+          files: libffmpeg-${{ env.PLATFORM }}-${{ env.FFMPEG_VERSION }}.zip
+          make_latest: false
