@@ -15,7 +15,6 @@ export RANLIB=${TARGET}-ranlib
 export STRIP=${TARGET}-strip
 
 export PKG_CONFIG_ALLOW_CROSS=1
-export PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
 echo "=== FFmpeg 32-bit DLL build ==="
 echo "Target: $TARGET"
