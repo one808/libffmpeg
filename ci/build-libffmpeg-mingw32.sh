@@ -15,6 +15,7 @@ export RANLIB=${TARGET}-ranlib
 export STRIP=${TARGET}-strip
 
 export PKG_CONFIG_ALLOW_CROSS=1
+export PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
 echo "=== FFmpeg 32-bit DLL build ==="
 echo "Target: $TARGET"
@@ -79,7 +80,7 @@ EXTRA_CFLAGS="-I$PREFIX/include"
 EXTRA_LDFLAGS="-L$PREFIX/lib"
 
 ./configure \
-    --disable-pkg-config \
+    --pkg-config=pkg-config \
     --target-os=mingw32 \
     --arch=x86 \
     --cross-prefix=${TARGET}- \
