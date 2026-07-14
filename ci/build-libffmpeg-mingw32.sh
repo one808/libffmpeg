@@ -74,8 +74,6 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
 
 # 7.5. Build OpenSSL
 echo "=== Building OpenSSL ==="
-export CROSS_COMPILE=i686-w64-mingw32-
-export WINDRES=i686-w64-mingw32-windres
 rm -rf "$DEPS/openssl"
 git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
 cd "$DEPS/openssl"
@@ -84,7 +82,7 @@ perl ./Configure mingw \
     --prefix="$PREFIX" \
     no-shared no-asm no-tests no-engine no-dynamic-engine no-comp 2>&1 | tail -30
 echo "=== OpenSSL Configure exit: $? ==="
-make -j$JOBS
+make -j$JOBS build_libs
 echo "=== OpenSSL make exit: $? ==="
 make install_sw
 echo "=== OpenSSL install exit: $? ==="
