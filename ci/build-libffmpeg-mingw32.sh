@@ -181,7 +181,7 @@ build_cmake "freetype" "https://github.com/freetype/freetype.git" \
     "-DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_BROTLI=ON"
 
 # 2. fribidi (needed by libass) - autotools
-# fribidi needs special handling (skip docs build)
+# fribidi: build gen.tab first, then lib
 echo "=== Building fribidi ==="
 if [ ! -d "$DEPS/fribidi" ]; then
     git clone --depth 1 https://github.com/fribidi/fribidi.git "$DEPS/fribidi"
@@ -189,8 +189,9 @@ fi
 cd "$DEPS/fribidi"
 ./autogen.sh 2>/dev/null || true
 ./configure --host=$TARGET --prefix="$PREFIX" --disable-docs --disable-tests --enable-static --disable-shared
-make -j$JOBS -C lib
-make install -C lib
+make -C gen.tab -j1
+make -j$JOBS
+make install
 cd "$WORK_DIR"
 
 # 3. libass
