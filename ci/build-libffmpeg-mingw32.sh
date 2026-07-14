@@ -72,7 +72,7 @@ build_dep "ogg" "https://github.com/xiph/ogg.git" \
 build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
-# --- Fix vorbis.pc for static linking ---
+# Fix vorbis.pc for static linking
 echo "=== Fixing vorbis.pc: add -logg ==="
 python3 -c "
 import os, glob
@@ -80,17 +80,14 @@ prefix = os.environ.get('PREFIX', '$PREFIX')
 for pc in glob.glob(os.path.join(prefix, 'lib', 'pkgconfig', 'vorbis*.pc')):
     c = open(pc).read()
     changed = False
-    # Fix Libs: add -logg -lm and ensure -lvorbis is present
     if 'Libs:' in c and '-logg' not in c:
         c = c.replace('Libs: -L\${libdir} -lvorbis ', 'Libs: -L\${libdir} -lvorbis -logg -lm')
         c = c.replace('Libs: -L\${libdir} -lvorbisenc ', 'Libs: -L\${libdir} -lvorbisenc -lvorbis -logg -lm')
         c = c.replace('Libs: -L\${libdir} -lvorbisfile ', 'Libs: -L\${libdir} -lvorbisfile -lvorbis -logg -lm')
         changed = True
-    # Fix vorbisenc.pc: add Requires: vorbis if missing
     if 'vorbisenc.pc' in pc and 'Requires:' not in c:
         c = c.replace('Description:', 'Requires: vorbis\nDescription:')
         changed = True
-    # Fix vorbisfile.pc: add Requires: vorbis if missing  
     if 'vorbisfile.pc' in pc and 'Requires:' not in c:
         c = c.replace('Description:', 'Requires: vorbis\nDescription:')
         changed = True
@@ -102,9 +99,55 @@ for pc in glob.glob(os.path.join(prefix, 'lib', 'pkgconfig', 'vorbis*.pc')):
 "
 cat "$PREFIX/lib/pkgconfig/vorbis.pc"
 
-# 8. Build FFmpeg
-echo "=== Building FFmpeg ==="
+# 7. NVIDIA Video Codec SDK headers
+echo "=== Downloading NVIDIA Video Codec SDK ==="
+mkdir -p "$PREFIX/include/ffnvcodec"
+git clone --depth 1 https://github.com/FFmpeg/nv-codec-headers.git /tmp/nv-codec-headers 2>/dev/null || \
+  git clone --depth 1 https://git.videolan.org/git/ffmpeg/nv-codec-headers.git /tmp/nv-codec-headers 2>/dev/null || true
+if [ -d /tmp/nv-codec-headers/include/ffnvcodec ]; then
+    cp /tmp/nv-codec-headers/include/ffnvcodec/*.h "$PREFIX/include/ffnvcodec/"
+    cp /tmp/nv-codec-headers/ffnvcodec.pc "$PREFIX/lib/pkgconfig/" 2>/dev/null || true
+    sed -i "s|prefix=.*|prefix=$PREFIX|" "$PREFIX/lib/pkgconfig/ffnvcodec.pc" 2>/dev/null || true
+    echo "NVIDIA Video Codec SDK headers installed"
+else
+    echo "NVIDIA Video Codec SDK not found, skipping"
+fi
+
+# 8. OpenSSL
+echo "=== Building OpenSSL ==="
+if [ ! -d "$DEPS/openssl" ]; then
+    git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
+fi
+cd "$DEPS/openssl"
+perl ./Configure mingw \
+    --prefix="$PREFIX" \
+    no-shared no-asm no-tests no-engine no-dynamic-engine no-comp no-legacy 2>&1 | tail -10
+make generate 2>/dev/null || true
+make -j$JOBS build_libs 2>&1 | tail -5
+
+# Install OpenSSL: copy headers (entire dir), libs, create pkgconfig
+mkdir -p "$PREFIX/include/openssl" "$PREFIX/lib"
+cp -r include/openssl/ "$PREFIX/include/openssl/" 2>/dev/null || true
+cp libssl.a "$PREFIX/lib/" 2>/dev/null || true
+cp libcrypto.a "$PREFIX/lib/" 2>/dev/null || true
+cat > "$PREFIX/lib/pkgconfig/openssl.pc" << OPEOF
+prefix=$PREFIX
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries
+Version: 3.5.1
+Requires:
+Libs: -L\${libdir} -lssl -lcrypto
+Cflags: -I\${includedir}
+OPEOF
+echo "OpenSSL installed: $(ls $PREFIX/lib/libssl.a $PREFIX/lib/libcrypto.a 2>/dev/null | wc -l) libs"
 cd "$WORK_DIR"
+
+# 9. Build FFmpeg
+echo "=== Building FFmpeg ==="
 
 EXTRA_LIBS="-L$PREFIX/lib -logg -lm"
 EXTRA_CFLAGS="-I$PREFIX/include"
@@ -122,15 +165,15 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nonfree \
     --enable-dxva2 \
     --enable-d3d11va \
-    --disable-nvdec \
-    --disable-nvenc \
+    --enable-nvdec \
+    --enable-nvenc \
     --enable-libx264 \
     --enable-libvpx \
     --enable-libmp3lame \
     --enable-libopus \
     --enable-libvorbis \
     --enable-libfdk-aac \
-    --disable-openssl \
+    --enable-openssl \
     --disable-libass \
     --disable-debug \
     --disable-doc \
@@ -142,7 +185,7 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
 make -j$JOBS
 make install
 
-# 9. Package artifact
+# 10. Package artifact
 echo "=== Package artifact ==="
 echo "Contents of artifact dir:"
 ls -la "$WORK_DIR/artifact/bin/" 2>/dev/null || echo "No bin dir"
