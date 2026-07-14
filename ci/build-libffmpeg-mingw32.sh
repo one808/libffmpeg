@@ -74,6 +74,8 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
 
 # 7.5. Build OpenSSL
 echo "=== Building OpenSSL ==="
+export CROSS_COMPILE=i686-w64-mingw32-
+export WINDRES=i686-w64-mingw32-windres
 rm -rf "$DEPS/openssl"
 git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
 cd "$DEPS/openssl"
