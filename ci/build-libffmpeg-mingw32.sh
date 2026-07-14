@@ -142,7 +142,8 @@ cmake "$DEPS/x265/source" \
     -DENABLE_CLI=OFF \
     -DENABLE_SHARED=OFF \
     -DENABLE_CLI=OFF \
-    -DCMAKE_ASM_NASM_OBJECT_FORMAT=win32 2>&1 | tail -10
+    -DCMAKE_ASM_NASM_OBJECT_FORMAT=win32 \
+    -DENABLE_ASM=OFF 2>&1 | tail -10
 make -j$JOBS
 make install
 cd "$WORK_DIR"
@@ -168,7 +169,8 @@ cmake "$DEPS/aom" \
     -DENABLE_DOCS=OFF \
     -DCMAKE_ASM_NASM_COMPILER=nasm \
     -DAOM_TARGET_CPU=x86 \
-    -DCMAKE_ASM_NASM_OBJECT_FORMAT=win32 2>&1 | tail -10
+    -DCMAKE_ASM_NASM_OBJECT_FORMAT=win32 \
+    -DENABLE_ASM=OFF 2>&1 | tail -10
 make -j$JOBS
 make install
 cd "$WORK_DIR"
