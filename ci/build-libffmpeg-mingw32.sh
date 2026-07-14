@@ -76,7 +76,7 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
 
-EXTRA_LIBS="-L$PREFIX/lib"
+EXTRA_LIBS="-L$PREFIX/lib -logg -lm"
 EXTRA_CFLAGS="-I$PREFIX/include"
 EXTRA_LDFLAGS="-L$PREFIX/lib"
 
