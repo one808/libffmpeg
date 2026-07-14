@@ -74,7 +74,18 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
 
 # --- Fix vorbis.pc for static linking ---
 echo "=== Fixing vorbis.pc: add -logg ==="
-python3 -c "import os; p='$PREFIX/lib/pkgconfig/vorbis.pc'; c=open(p).read(); c=c.replace('Libs: -L\${libdir} -lvorbis','Libs: -L\${libdir} -lvorbis -logg -lm'); open(p,'w').write(c); print('Fixed')"
+python3 -c "
+import os, glob
+prefix = os.environ.get('PREFIX', '$PREFIX')
+for pc in glob.glob(os.path.join(prefix, 'lib', 'pkgconfig', 'vorbis*.pc')):
+    c = open(pc).read()
+    if '-logg' not in c and 'Libs:' in c:
+        c = c.replace('Libs: -L\${libdir} -lvorbis ', 'Libs: -L\${libdir} -lvorbis -logg -lm')
+        c = c.replace('Libs: -L\${libdir} -lvorbisenc ', 'Libs: -L\${libdir} -lvorbisenc -lvorbis -logg -lm')
+        c = c.replace('Libs: -L\${libdir} -lvorbisfile ', 'Libs: -L\${libdir} -lvorbisfile -lvorbis -logg -lm')
+        open(pc, 'w').write(c)
+        print(f'Fixed {os.path.basename(pc)}')
+"
 cat "$PREFIX/lib/pkgconfig/vorbis.pc"
 
 # 8. Build FFmpeg
