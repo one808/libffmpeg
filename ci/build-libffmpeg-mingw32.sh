@@ -119,34 +119,6 @@ MESONEOF
 build_meson "dav1d" "https://code.videolan.org/videolan/dav1d.git" \
     "-Denable_tests=false -Denable_examples=false -Dlogging=false"
 
-# 2. x265 (HEVC encoder)
-echo "=== Building x265 ==="
-if [ ! -d "$DEPS/x265" ]; then
-    git clone --depth 1 https://bitbucket.org/multicoreware/x265_git.git "$DEPS/x265"
-fi
-mkdir -p "$DEPS/x265_build"
-cd "$DEPS/x265_build"
-cmake "$DEPS/x265/source" \
-    -DCMAKE_SYSTEM_NAME=Windows \
-    -DCMAKE_SYSTEM_PROCESSOR=x86 \
-    -DCMAKE_C_COMPILER=${TARGET}-gcc \
-    -DCMAKE_CXX_COMPILER=${TARGET}-g++ \
-    -DCMAKE_RC_COMPILER=${TARGET}-windres \
-    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-    -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-    -DCMAKE_ASM_NASM_COMPILER=nasm \
-    -DHIGH_BIT_DEPTH=OFF \
-    -DENABLE_HDR10_PLUS=OFF \
-    -DEXPORT_C_API=OFF \
-    -DENABLE_CLI=OFF \
-    -DENABLE_SHARED=OFF \
-    -DENABLE_CLI=OFF \
-    -DCMAKE_ASM_NASM_OBJECT_FORMAT=win32 \
-    -DENABLE_ASM=OFF 2>&1 | tail -10
-make -j$JOBS
-make install
-cd "$WORK_DIR"
 
 # 3. aom (AV1 encoder/decoder)
 echo "=== Building aom ==="
@@ -348,7 +320,6 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nvdec \
     --enable-nvenc \
     --enable-libx264 \
-    --enable-libx265 \
     --enable-libopenh264 \
     --enable-libvidstab \
     --enable-libzimg \
