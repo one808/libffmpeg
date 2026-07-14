@@ -74,6 +74,7 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
 
 # 8. Build FFmpeg
 echo "=== Building FFmpeg ==="
+set +e
 cd "$WORK_DIR"
 
 EXTRA_LIBS="-L$PREFIX/lib"
@@ -109,6 +110,13 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --extra-ldflags="$EXTRA_LDFLAGS" \
     --extra-libs="$EXTRA_LIBS"
 
+set -e
+CONFIGURE_EXIT=$?
+if [ $CONFIGURE_EXIT -ne 0 ]; then
+    echo "=== config.log vorbis section ==="
+    grep -B2 -A20 "vorbis" ffbuild/config.log 2>/dev/null | head -40
+    exit $CONFIGURE_EXIT
+fi
 make -j$JOBS
 make install
 
