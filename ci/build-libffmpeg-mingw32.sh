@@ -117,7 +117,7 @@ MESONEOF
 
 # 1. dav1d (AV1 decoder)
 build_meson "dav1d" "https://code.videolan.org/videolan/dav1d.git" \
-    "-Denable_tests=false -Denable_examples=false -Dlogging=false -Dbitdepths='8,16'"
+    "-Denable_tests=false -Denable_examples=false -Dlogging=false"
 
 # 2. x265 (HEVC encoder)
 echo "=== Building x265 ==="
