@@ -197,7 +197,23 @@ make -j$JOBS
 make install
 cd "$WORK_DIR"
 
-# 5. freetype2 (needed by libass)
+# 5. vid.stab (video stabilization)
+build_cmake "vid.stab" "https://github.com/georgmartius/vid.stab.git" \
+    "-DUSE_OMP=OFF"
+
+# 6. zimg (high-quality scaling)
+build_meson "zimg" "https://github.com/sekrit-twc/zimg.git" \
+    "-Denable_test=false -Denable_example=false"
+
+# 7. rubberband (time-stretching)
+build_meson "rubberband" "https://github.com/breakfastquay/rubberband.git" \
+    "-Dfft=builtin -Dresampler=builtin -Djni=disabled"
+
+# 8. libsrt (SRT protocol)
+build_cmake "srt" "https://github.com/Haivision/srt.git" \
+    "-DENABLE_SHARED=OFF -DENABLE_APPS=OFF -DENABLE_TESTING=OFF -DENABLE_TEST_PROGRAMS=OFF -DUSE_ENCLIB=none"
+
+# 9. freetype2 (needed by libass)
 build_cmake "freetype" "https://github.com/freetype/freetype.git" \
     "-DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_BROTLI=ON"
 
@@ -333,6 +349,10 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-libx264 \
     --enable-libx265 \
     --enable-libopenh264 \
+    --enable-libvidstab \
+    --enable-libzimg \
+    --enable-librubberband \
+    --enable-libsrt \
     --enable-libdav1d \
     --enable-libaom \
     --enable-libvpx \
