@@ -190,8 +190,8 @@ cd "$DEPS/fribidi"
 ./autogen.sh 2>/dev/null || true
 ./configure --host=$TARGET --prefix="$PREFIX" --disable-docs --disable-tests --enable-static --disable-shared
 make -C gen.tab -j1
-make -j$JOBS
-make install
+make -j$JOBS -C lib
+make install -C lib
 cd "$WORK_DIR"
 
 # 3. libass
