@@ -158,7 +158,7 @@ build_cmake "vid.stab" "https://github.com/georgmartius/vid.stab.git" \
 
 # 6. zimg (high-quality scaling) - autotools
 build_dep "zimg" "https://github.com/sekrit-twc/zimg.git" \
-    "--disable-doc --disableexamples"
+    "--disable-doc"
 
 # 7. rubberband (time-stretching)
 build_meson "rubberband" "https://github.com/breakfastquay/rubberband.git" \
