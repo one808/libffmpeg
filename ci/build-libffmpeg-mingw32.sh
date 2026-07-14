@@ -180,7 +180,7 @@ build_cmake "srt" "https://github.com/Haivision/srt.git" \
 # 9. Build FFmpeg
 echo "=== Building FFmpeg ==="
 
-EXTRA_LIBS="-L$PREFIX/lib -logg -lm"
+EXTRA_LIBS="-L$PREFIX/lib"
 EXTRA_CFLAGS="-I$PREFIX/include"
 EXTRA_LDFLAGS="-L$PREFIX/lib"
 
