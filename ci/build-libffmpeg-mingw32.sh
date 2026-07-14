@@ -120,6 +120,7 @@ build_meson "dav1d" "https://code.videolan.org/videolan/dav1d.git" \
     "-Denable_tests=false -Denable_examples=false -Dlogging=false"
 
 
+export ASM_NASM=/usr/bin/nasm
 # 3. aom (AV1 encoder/decoder)
 echo "=== Building aom ==="
 if [ ! -d "$DEPS/aom" ]; then
@@ -139,7 +140,7 @@ cmake "$DEPS/aom" \
     -DENABLE_EXAMPLES=OFF \
     -DENABLE_TESTS=OFF \
     -DENABLE_DOCS=OFF \
-    -DCMAKE_ASM_NASM_COMPILER=nasm \
+    -DCMAKE_ASM_NASM_COMPILER=/usr/bin/nasm \
     -DAOM_TARGET_CPU=x86 \
     -DCMAKE_ASM_NASM_OBJECT_FORMAT=win32 \
     -DENABLE_ASM=OFF 2>&1 | tail -10
