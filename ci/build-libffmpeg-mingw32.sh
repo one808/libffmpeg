@@ -180,23 +180,10 @@ build_cmake "srt" "https://github.com/Haivision/srt.git" \
 build_cmake "freetype" "https://github.com/freetype/freetype.git" \
     "-DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_BROTLI=ON"
 
-# 2. fribidi (needed by libass) - autotools
-# fribidi: build gen.tab first, then lib
-echo "=== Building fribidi ==="
-if [ ! -d "$DEPS/fribidi" ]; then
-    git clone --depth 1 https://github.com/fribidi/fribidi.git "$DEPS/fribidi"
-fi
-cd "$DEPS/fribidi"
-./autogen.sh 2>/dev/null || true
-./configure --host=$TARGET --prefix="$PREFIX" --disable-docs --disable-tests --enable-static --disable-shared
-make -C gen.tab -j1
-make -j$JOBS -C lib
-make install -C lib
-cd "$WORK_DIR"
 
 # 3. libass
 build_dep "libass" "https://github.com/libass/libass.git" \
-    "--disable-fontconfig --disable-harfbuzz --disable-coretext"
+    "--disable-fontconfig --disable-harfbuzz --disable-coretext --disable-fribidi"
 
 # 1. x264
 build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
