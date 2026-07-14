@@ -69,7 +69,55 @@ build_cmake() {
     cd "$WORK_DIR"
 }
 
-# 1. freetype2 (needed by libass)
+# Helper: build meson project
+build_meson() {
+    local name=$1 url=$2 meson_args=$3
+    echo "=== Building $name (meson) ==="
+    if [ ! -d "$DEPS/$name" ]; then
+        git clone --depth 1 "$url" "$DEPS/$name"
+    fi
+    rm -rf "$DEPS/${name}_build"
+    mkdir -p "$DEPS/${name}_build"
+    cd "$DEPS/${name}_build"
+    meson setup "$DEPS/$name" \
+        --cross-file /tmp/meson-cross.ini \
+        --prefix="$PREFIX" \
+        --default-library=static \
+        --buildtype=release \
+        $meson_args 2>&1 | tail -5
+    ninja
+    ninja install
+    cd "$WORK_DIR"
+}
+
+# Create meson cross-compilation file
+cat > /tmp/meson-cross.ini << MESONEOF
+[binaries]
+c = '${TARGET}-gcc'
+cpp = '${TARGET}-g++'
+ar = '${TARGET}-ar'
+strip = '${TARGET}-strip'
+pkgconfig = 'pkg-config'
+windres = '${TARGET}-windres'
+
+[host_machine]
+system = 'windows'
+cpu_family = 'x86'
+cpu = 'i686'
+endian = 'little'
+
+[built-in properties]
+c_args = ['-I${PREFIX}/include']
+c_link_args = ['-L${PREFIX}/lib']
+cpp_args = ['-I${PREFIX}/include']
+cpp_link_args = ['-L${PREFIX}/lib']
+MESONEOF
+
+# 1. dav1d (AV1 decoder)
+build_meson "dav1d" "https://code.videolan.org/videolan/dav1d.git" \
+    "-Denable_tests=false -Denable_examples=false -Dlogging=false -Dbitdepths='8,16'"
+
+# 2. freetype2 (needed by libass)
 build_cmake "freetype" "https://github.com/freetype/freetype.git" \
     "-DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_BROTLI=ON"
 
@@ -203,6 +251,7 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nvdec \
     --enable-nvenc \
     --enable-libx264 \
+    --enable-libdav1d \
     --enable-libvpx \
     --enable-libmp3lame \
     --enable-libopus \
