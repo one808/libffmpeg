@@ -72,6 +72,11 @@ build_dep "ogg" "https://github.com/xiph/ogg.git" \
 build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
+# --- Fix vorbis.pc for static linking ---
+echo "=== Fixing vorbis.pc: add -logg ==="
+python3 -c "import os; p='$PREFIX/lib/pkgconfig/vorbis.pc'; c=open(p).read(); c=c.replace('Libs: -L\${libdir} -lvorbis','Libs: -L\${libdir} -lvorbis -logg -lm'); open(p,'w').write(c); print('Fixed')"
+cat "$PREFIX/lib/pkgconfig/vorbis.pc"
+
 # 8. Build FFmpeg
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
