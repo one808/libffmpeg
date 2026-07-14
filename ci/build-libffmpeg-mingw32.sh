@@ -174,7 +174,30 @@ make -j$JOBS
 make install
 cd "$WORK_DIR"
 
-# 4. freetype2 (needed by libass)
+# 4. openh264 (Cisco H.264)
+echo "=== Building openh264 ==="
+if [ ! -d "$DEPS/openh264" ]; then
+    git clone --depth 1 https://github.com/cisco/openh264.git "$DEPS/openh264"
+fi
+mkdir -p "$DEPS/openh264_build"
+cd "$DEPS/openh264_build"
+cmake "$DEPS/openh264" \
+    -DCMAKE_SYSTEM_NAME=Windows \
+    -DCMAKE_SYSTEM_PROCESSOR=x86 \
+    -DCMAKE_C_COMPILER=${TARGET}-gcc \
+    -DCMAKE_CXX_COMPILER=${TARGET}-g++ \
+    -DCMAKE_RC_COMPILER=${TARGET}-windres \
+    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DENABLE_SVC=OFF \
+    -DENABLE_CLI=OFF \
+    -DCMAKE_ASM_NASM_COMPILER=nasm 2>&1 | tail -5
+make -j$JOBS
+make install
+cd "$WORK_DIR"
+
+# 5. freetype2 (needed by libass)
 build_cmake "freetype" "https://github.com/freetype/freetype.git" \
     "-DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_BROTLI=ON"
 
@@ -309,6 +332,7 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nvenc \
     --enable-libx264 \
     --enable-libx265 \
+    --enable-libopenh264 \
     --enable-libdav1d \
     --enable-libaom \
     --enable-libvpx \
