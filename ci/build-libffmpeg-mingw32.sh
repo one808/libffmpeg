@@ -78,7 +78,7 @@ rm -rf "$DEPS/openssl"
 git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
 cd "$DEPS/openssl"
 echo "=== OpenSSL Configure ==="
-perl ./Configure mingw32 \
+perl ./Configure mingw \
     --prefix="$PREFIX" \
     no-shared no-asm no-tests no-engine no-dynamic-engine no-comp 2>&1 | tail -20
 echo "=== OpenSSL Configure exit: $? ==="
