@@ -174,7 +174,7 @@ build_meson "rubberband" "https://github.com/breakfastquay/rubberband.git" \
 
 # 8. libsrt (SRT protocol)
 build_cmake "srt" "https://github.com/Haivision/srt.git" \
-    "-DENABLE_SHARED=OFF -DENABLE_APPS=OFF -DENABLE_TESTING=OFF -DENABLE_TEST_PROGRAMS=OFF -DUSE_ENCLIB=none"
+    "-DENABLE_SHARED=OFF -DENABLE_APPS=OFF -DENABLE_TESTING=OFF -DENABLE_TEST_PROGRAMS=OFF -DENABLE_ENCRYPTION=OFF -DENABLE_SOCKS=OFF"
 
 # 9. freetype2 (needed by libass)
 build_cmake "freetype" "https://github.com/freetype/freetype.git" \
