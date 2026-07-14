@@ -126,8 +126,7 @@ if [ ! -d "$DEPS/x265" ]; then
 fi
 mkdir -p "$DEPS/x265_build"
 cd "$DEPS/x265_build"
-cd source
-cmake . \
+cmake "$DEPS/x265/source" \
     -DCMAKE_SYSTEM_NAME=Windows \
     -DCMAKE_SYSTEM_PROCESSOR=x86 \
     -DCMAKE_C_COMPILER=${TARGET}-gcc \
