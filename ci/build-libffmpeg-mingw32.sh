@@ -80,6 +80,7 @@ cd "$DEPS/openssl"
 echo "=== OpenSSL Configure ==="
 perl ./Configure mingw \
     --prefix="$PREFIX" \
+    --cross-compile-prefix=i686-w64-mingw32- \
     no-shared no-asm no-tests no-engine no-dynamic-engine no-comp 2>&1 | tail -20
 echo "=== OpenSSL Configure exit: $? ==="
 make -j$JOBS 2>&1 | tail -10
