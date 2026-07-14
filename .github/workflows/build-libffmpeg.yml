@@ -82,6 +82,13 @@ jobs:
           chmod +x build-libffmpeg-mingw32.sh
           ./build-libffmpeg-mingw32.sh
 
+      - name: Upload config.log on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ffmpeg-config-log
+          path: ffmpeg-source/ffbuild/config.log
+
       - name: Package ZIP
         run: |
           cd ffmpeg-source/artifact
