@@ -88,13 +88,11 @@ for pc in glob.glob(os.path.join(prefix, 'lib', 'pkgconfig', 'vorbis*.pc')):
         changed = True
     # Fix vorbisenc.pc: add Requires: vorbis if missing
     if 'vorbisenc.pc' in pc and 'Requires:' not in c:
-        c = c.replace('Description:', 'Requires: vorbis
-Description:')
+        c = c.replace('Description:', 'Requires: vorbis\nDescription:')
         changed = True
     # Fix vorbisfile.pc: add Requires: vorbis if missing  
     if 'vorbisfile.pc' in pc and 'Requires:' not in c:
-        c = c.replace('Description:', 'Requires: vorbis
-Description:')
+        c = c.replace('Description:', 'Requires: vorbis\nDescription:')
         changed = True
     if changed:
         open(pc, 'w').write(c)
