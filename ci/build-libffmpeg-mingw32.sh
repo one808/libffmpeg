@@ -156,9 +156,9 @@ build_meson "openh264" "https://github.com/cisco/openh264.git" \
 build_cmake "vid.stab" "https://github.com/georgmartius/vid.stab.git" \
     "-DUSE_OMP=OFF"
 
-# 6. zimg (high-quality scaling)
-build_meson "zimg" "https://github.com/sekrit-twc/zimg.git" \
-    "-Denable_test=false -Denable_example=false"
+# 6. zimg (high-quality scaling) - autotools
+build_dep "zimg" "https://github.com/sekrit-twc/zimg.git" \
+    "--disable-doc --disableexamples"
 
 # 7. rubberband (time-stretching)
 build_meson "rubberband" "https://github.com/breakfastquay/rubberband.git" \
