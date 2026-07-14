@@ -72,23 +72,6 @@ build_dep "ogg" "https://github.com/xiph/ogg.git" \
 build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
-# 7.5. Build OpenSSL
-echo "=== Building OpenSSL ==="
-rm -rf "$DEPS/openssl"
-git clone --depth 1 --branch openssl-3.5.1 https://github.com/openssl/openssl.git "$DEPS/openssl"
-cd "$DEPS/openssl"
-echo "=== OpenSSL Configure ==="
-perl ./Configure mingw \
-    --prefix="$PREFIX" \
-    no-shared no-asm no-tests no-engine no-dynamic-engine no-comp no-legacy 2>&1 | tail -30
-echo "=== OpenSSL Configure exit: $? ==="
-make generate
-make -j$JOBS libssl.a libcrypto.a
-echo "=== OpenSSL make exit: $? ==="
-make install_dev
-echo "=== OpenSSL install exit: $? ==="
-cd "$WORK_DIR"
-
 # --- Fix vorbis.pc for static linking ---
 echo "=== Fixing vorbis.pc: add -logg ==="
 python3 -c "
@@ -147,7 +130,7 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-libopus \
     --enable-libvorbis \
     --enable-libfdk-aac \
-    --enable-openssl \
+    --disable-openssl \
     --disable-libass \
     --disable-debug \
     --disable-doc \
