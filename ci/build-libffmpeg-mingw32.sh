@@ -79,12 +79,28 @@ import os, glob
 prefix = os.environ.get('PREFIX', '$PREFIX')
 for pc in glob.glob(os.path.join(prefix, 'lib', 'pkgconfig', 'vorbis*.pc')):
     c = open(pc).read()
-    if '-logg' not in c and 'Libs:' in c:
+    changed = False
+    # Fix Libs: add -logg -lm and ensure -lvorbis is present
+    if 'Libs:' in c and '-logg' not in c:
         c = c.replace('Libs: -L\${libdir} -lvorbis ', 'Libs: -L\${libdir} -lvorbis -logg -lm')
         c = c.replace('Libs: -L\${libdir} -lvorbisenc ', 'Libs: -L\${libdir} -lvorbisenc -lvorbis -logg -lm')
         c = c.replace('Libs: -L\${libdir} -lvorbisfile ', 'Libs: -L\${libdir} -lvorbisfile -lvorbis -logg -lm')
+        changed = True
+    # Fix vorbisenc.pc: add Requires: vorbis if missing
+    if 'vorbisenc.pc' in pc and 'Requires:' not in c:
+        c = c.replace('Description:', 'Requires: vorbis
+Description:')
+        changed = True
+    # Fix vorbisfile.pc: add Requires: vorbis if missing  
+    if 'vorbisfile.pc' in pc and 'Requires:' not in c:
+        c = c.replace('Description:', 'Requires: vorbis
+Description:')
+        changed = True
+    if changed:
         open(pc, 'w').write(c)
         print(f'Fixed {os.path.basename(pc)}')
+    else:
+        print(f'No changes needed for {os.path.basename(pc)}')
 "
 cat "$PREFIX/lib/pkgconfig/vorbis.pc"
 
