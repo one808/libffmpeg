@@ -150,7 +150,7 @@ cd "$WORK_DIR"
 
 # 4. openh264 (Cisco H.264) - uses meson
 build_meson "openh264" "https://github.com/cisco/openh264.git" \
-    "-Dtests=disabled -Dexamples=disabled -Dcli=disabled"
+    "-Dtests=disabled"
 
 # 5. vid.stab (video stabilization)
 build_cmake "vid.stab" "https://github.com/georgmartius/vid.stab.git" \
