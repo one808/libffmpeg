@@ -156,9 +156,17 @@ build_meson "openh264" "https://github.com/cisco/openh264.git" \
 build_cmake "vid.stab" "https://github.com/georgmartius/vid.stab.git" \
     "-DUSE_OMP=OFF"
 
-# 6. zimg (high-quality scaling) - autotools
-build_dep "zimg" "https://github.com/sekrit-twc/zimg.git" \
-    "--disable-doc"
+# 6. zimg (high-quality scaling) - autotools (needs submodule)
+echo "=== Building zimg ==="
+if [ ! -d "$DEPS/zimg" ]; then
+    git clone --depth 1 --recurse-submodules https://github.com/sekrit-twc/zimg.git "$DEPS/zimg"
+fi
+cd "$DEPS/zimg"
+./autogen.sh 2>/dev/null || true
+./configure --host=$TARGET --prefix="$PREFIX" --disable-doc --enable-static --disable-shared
+make -j$JOBS
+make install
+cd "$WORK_DIR"
 
 # 7. rubberband (time-stretching)
 build_meson "rubberband" "https://github.com/breakfastquay/rubberband.git" \
