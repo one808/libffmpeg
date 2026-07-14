@@ -183,7 +183,7 @@ build_cmake "freetype" "https://github.com/freetype/freetype.git" \
 
 # 3. libass
 build_dep "libass" "https://github.com/libass/libass.git" \
-    "--disable-fontconfig --disable-harfbuzz --disable-coretext --disable-fribidi"
+    "--disable-fontconfig --disable-harfbuzz --disable-coretext --without-fribidi"
 
 # 1. x264
 build_dep "x264" "https://code.videolan.org/videolan/x264.git" \
