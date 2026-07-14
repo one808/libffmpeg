@@ -15,6 +15,7 @@ export RANLIB=${TARGET}-ranlib
 export STRIP=${TARGET}-strip
 
 export PKG_CONFIG_ALLOW_CROSS=1
+export PKG_CONFIG=/usr/bin/pkg-config
 export PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
 echo "=== FFmpeg 32-bit DLL build ==="
@@ -72,21 +73,6 @@ build_dep "vorbis" "https://github.com/xiph/vorbis.git" \
     "--enable-static --disable-shared --disable-examples"
 
 # 8. Build FFmpeg
-echo "=== Debug: vpx.pc ==="
-cat "$PREFIX/lib/pkgconfig/vpx.pc" 2>/dev/null || echo "vpx.pc not found"
-echo "=== Debug: PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR ==="
-echo "=== Debug: pkg-config vpx ==="
-pkg-config --cflags --libs vpx 2>&1 || echo "pkg-config vpx failed"
-echo "=== Debug: vorbis.pc ==="
-cat "$PREFIX/lib/pkgconfig/vorbis.pc" 2>/dev/null || echo "vorbis.pc not found"
-echo "=== Debug: ogg.pc ==="
-cat "$PREFIX/lib/pkgconfig/ogg.pc" 2>/dev/null || echo "ogg.pc not found"
-echo "=== Debug: pkg-config vorbis ==="
-pkg-config --cflags --libs vorbis 2>&1 || echo "pkg-config vorbis FAILED"
-echo "=== Debug: pkg-config ogg ==="
-pkg-config --cflags --libs ogg 2>&1 || echo "pkg-config ogg FAILED"
-echo "=== Debug: pkg-config --modversion vorbis ==="
-pkg-config --modversion vorbis 2>&1 || echo "modversion FAILED"
 echo "=== Building FFmpeg ==="
 cd "$WORK_DIR"
 
