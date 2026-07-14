@@ -180,9 +180,9 @@ build_cmake "srt" "https://github.com/Haivision/srt.git" \
 build_cmake "freetype" "https://github.com/freetype/freetype.git" \
     "-DFT_DISABLE_HARFBUZZ=ON -DFT_DISABLE_BROTLI=ON"
 
-# 2. fribidi (needed by libass)
-build_cmake "fribidi" "https://github.com/fribidi/fribidi.git" \
-    "-DFRIBIDI_TEST=OFF -DBUILD_SHARED_LIBS=OFF"
+# 2. fribidi (needed by libass) - autotools
+build_dep "fribidi" "https://github.com/fribidi/fribidi.git" \
+    "--disable-docs --disable-tests"
 
 # 3. libass
 build_dep "libass" "https://github.com/libass/libass.git" \
