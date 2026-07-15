@@ -260,7 +260,7 @@ build_cmake "srt" "https://github.com/Haivision/srt.git" \
 # 9. Build FFmpeg
 echo "=== Building FFmpeg ==="
 
-EXTRA_LIBS="-L$PREFIX/lib"
+EXTRA_LIBS="-L$PREFIX/lib -lpthread -lws2_32 -lbcrypt -ladvapi32"
 EXTRA_CFLAGS="-I$PREFIX/include"
 EXTRA_LDFLAGS="-L$PREFIX/lib"
 
