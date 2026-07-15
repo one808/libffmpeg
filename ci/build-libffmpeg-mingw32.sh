@@ -247,10 +247,6 @@ make -j$JOBS
 make install
 cd "$WORK_DIR"
 
-# 4. openh264 (Cisco H.264) - uses meson
-build_meson "openh264" "https://github.com/cisco/openh264.git" \
-    "-Dtests=disabled"
-
 # 5. vid.stab (video stabilization)
 build_cmake "vid.stab" "https://github.com/georgmartius/vid.stab.git" \
     "-DUSE_OMP=OFF"
@@ -298,7 +294,6 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nvdec \
     --enable-nvenc \
     --enable-libx264 \
-    --enable-libopenh264 \
     --enable-libvidstab \
     --enable-libzimg \
     --enable-librubberband \
