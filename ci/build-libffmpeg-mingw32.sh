@@ -276,8 +276,6 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-nonfree \
     --enable-dxva2 \
     --enable-d3d11va \
-    --enable-nvdec \
-    --enable-nvenc \
     --enable-libx264 \
     --enable-libdav1d \
     --enable-libaom \
