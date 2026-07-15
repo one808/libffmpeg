@@ -213,7 +213,7 @@ Name: OpenSSL
 Description: Secure Sockets Layer and cryptography libraries
 Version: 3.5.1
 Requires:
-Libs: -L\${libdir} -lssl -lcrypto
+Libs: -L\${libdir} -lssl -lcrypto -lws2_32 -lcrypt32 -ladvapi32
 Cflags: -I\${includedir}
 OPEOF
 echo "OpenSSL installed: $(ls $PREFIX/lib/libssl.a $PREFIX/lib/libcrypto.a 2>/dev/null | wc -l) libs"
