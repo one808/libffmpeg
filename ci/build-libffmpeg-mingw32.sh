@@ -200,7 +200,7 @@ make generate 2>/dev/null || true
 make -j$JOBS build_libs 2>&1 | tail -5
 
 mkdir -p "$PREFIX/include/openssl" "$PREFIX/lib"
-cp -r include/openssl/ "$PREFIX/include/openssl/" 2>/dev/null || true
+cp -r include/openssl/* "$PREFIX/include/openssl/" 2>/dev/null || true
 cp libssl.a "$PREFIX/lib/" 2>/dev/null || true
 cp libcrypto.a "$PREFIX/lib/" 2>/dev/null || true
 cat > "$PREFIX/lib/pkgconfig/openssl.pc" << OPEOF
