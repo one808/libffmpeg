@@ -297,7 +297,6 @@ EXTRA_LDFLAGS="-L$PREFIX/lib"
     --enable-libvidstab \
     --enable-libzimg \
     --enable-librubberband \
-    --enable-libsrt \
     --enable-libdav1d \
     --enable-libaom \
     --enable-libvpx \
